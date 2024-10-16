@@ -26,3 +26,14 @@ For previous releases, please refer to <a href="https://github.com/dashio-connec
 ### 1.2.0 (30 September 2024)
 
 - Release to Arduino library
+
+### 1.2.1 (1 October 2024)
+
+- Updated library properties
+
+### 1.2.2 (16 October 2024)
+
+- New TextBox message helper functions for Int and Float
+- Support for Table Control that will soon be released
+- Minor efficiency improvements
+

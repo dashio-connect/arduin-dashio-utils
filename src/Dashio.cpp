@@ -60,6 +60,7 @@
 #define MAP_ID "MAP"
 #define COLOR_ID "CLR"
 #define AV_ID "AVD"
+#define TABLE_ID "TBL"
 #define BASIC_CONFIG_ID "BAS"
 
 #define DEVICE_NAME_ID "NAME"
@@ -119,7 +120,7 @@
 
 char DASH_SERVER[] = "dash.dashio.io";
 
-String formatFloat(float value) {
+String formatFloat(float value) { //??? OBSOLETE - remove
     if (value == INVALID_FLOAT_VALUE) {
         return "nan";
     } else if (abs(value) < SMALLEST_FLOAT_VALUE) {
@@ -129,22 +130,51 @@ String formatFloat(float value) {
     char buffer[16];
 #ifdef ARDUINO_ARCH_AVR
     dtostrf(value, 5, 2, buffer);
-    return buffer;
+    return String(buffer);
 #else
     if ((abs(value) < 1.0) || (abs(value) >= 100000)){
         sprintf(buffer, "%5.2e", value);
     } else {
         sprintf(buffer, "%5.2f", value);
     }
-    return buffer;
+    return String(buffer);
 #endif
 }
 
-String formatInt(int value) {
+void formatFloat(String& message, float value) {
+    if (value == INVALID_FLOAT_VALUE) {
+        message += "nan";
+    } else if (abs(value) < SMALLEST_FLOAT_VALUE) {
+        message += "0";
+    } else {
+        char buffer[16];
+#ifdef ARDUINO_ARCH_AVR
+        dtostrf(value, 5, 2, buffer);
+        message += String(buffer);
+#else
+        if ((abs(value) < 1.0) || (abs(value) >= 100000)){
+            sprintf(buffer, "%5.2e", value);
+        } else {
+            sprintf(buffer, "%5.2f", value);
+        }
+        message += String(buffer);
+#endif
+    }
+}
+
+String formatInt(int value) { //??? OBSOLETE - remove
     if (value == INVALID_INT_VALUE) {
         return "nan";
     } else {
         return String(value);
+    }
+}
+
+void formatInt(String& message, int value) {
+    if (value == INVALID_INT_VALUE) {
+        message += "nan";
+    } else {
+        message += String(value);
     }
 }
 
@@ -697,6 +727,28 @@ String DashioDevice::getTextBoxMessage(const String& controlID, const String& te
     return message;
 }
 
+String DashioDevice::getTextBoxMessage(const String& controlID, float value, const String& color) {
+    String message = getControlBaseMessage(TEXT_BOX_ID, controlID);
+    formatFloat(message, value);
+    if (color != "") {
+        message += String(DELIM);
+        message += color;
+    }
+    message += String(END_DELIM);
+    return message;
+}
+
+String DashioDevice::getTextBoxMessage(const String& controlID, int value, const String& color) {
+    String message = getControlBaseMessage(TEXT_BOX_ID, controlID);
+    formatInt(message, value);
+    if (color != "") {
+        message += String(DELIM);
+        message += color;
+    }
+    message += String(END_DELIM);
+    return message;
+}
+
 String DashioDevice::getTextBoxCaptionMessage(const String& controlID, const String& text, const String& color) {
     String message = getControlBaseMessage(TEXT_CAPTION_ID, controlID);
     message += text;
@@ -706,6 +758,109 @@ String DashioDevice::getTextBoxCaptionMessage(const String& controlID, const Str
     }
     message += String(END_DELIM);
     return message;
+}
+
+void DashioDevice::addTableClearMessage(String& message, const String& controlID) {
+    message += String(DELIM);
+    message += deviceID;
+    message += String(DELIM);
+    message += TABLE_ID;
+    message += String(DELIM);
+    message += controlID;
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, String rowData[], int dataLength) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        message += rowData[i];
+    }
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, String rowData[], int dataLength, const String& label, const String& units) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        message += rowData[i];
+    }
+
+    if (label.length() > 0) {
+        message += String(DELIM);
+        message += label;
+        if (units.length() > 0) {
+            message += String(DELIM);
+            message += units;
+        }
+    }
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, int rowData[], int dataLength) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        formatInt(message, rowData[i]);
+    }
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, int rowData[], int dataLength, const String& label, const String& units) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        formatInt(message, rowData[i]);
+    }
+
+    if (label.length() > 0) {
+        message += String(DELIM);
+        message += label;
+        if (units.length() > 0) {
+            message += String(DELIM);
+            message += units;
+        }
+    }
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        formatFloat(message, rowData[i]);
+    }
+    message += String(END_DELIM);
+}
+
+void DashioDevice::addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength, const String& label, const String& units) {
+    addControlBaseMessage(message, TABLE_ID, controlID);
+    message += String(rowIndex);
+    for (int i = 0; i < dataLength; i++) {
+        message += String(DELIM);
+        formatFloat(message, rowData[i]);
+    }
+
+    if (label.length() > 0) {
+        message += String(DELIM);
+        message += label;
+        if (units.length() > 0) {
+            message += String(DELIM);
+            message += units;
+        }
+    }
+    message += String(END_DELIM);
 }
 
 String DashioDevice::getSelectorMessage(const String& controlID) {
@@ -743,14 +898,14 @@ String DashioDevice::getSelectorMessage(const String& controlID, int index, cons
 
 String DashioDevice::getSliderMessage(const String& controlID, int value) {
     String message = getControlBaseMessage(SLIDER_ID, controlID);
-    message += formatInt(value);
+    formatInt(message, value);
     message += String(END_DELIM);
     return message;
 }
 
 String DashioDevice::getSliderMessage(const String& controlID, float value) {
     String message = getControlBaseMessage(SLIDER_ID, controlID);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -764,14 +919,14 @@ String DashioDevice::getSliderMessage(const String& controlID) {
 
 String DashioDevice::getSingleBarMessage(const String& controlID, int value) {
     String message = getControlBaseMessage(BAR_ID, controlID);
-    message += formatInt(value);
+    formatInt(message, value);
     message += String(END_DELIM);
     return message;
 }
 
 String DashioDevice::getSingleBarMessage(const String& controlID, float value) {
     String message = getControlBaseMessage(BAR_ID, controlID);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -812,14 +967,14 @@ String DashioDevice::getDoubleBarMessage(const String& controlID) {
 
 String DashioDevice::getKnobMessage(const String& controlID, int value) {
     String message = getControlBaseMessage(KNOB_ID, controlID);
-    message += formatInt(value);
+    formatInt(message, value);
     message += String(END_DELIM);
     return message;
 }
 
 String DashioDevice::getKnobMessage(const String& controlID, float value) {
     String message = getControlBaseMessage(KNOB_ID, controlID);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -833,14 +988,14 @@ String DashioDevice::getKnobMessage(const String& controlID) {
 
 String DashioDevice::getKnobDialMessage(const String& controlID, int value) {
     String message = getControlBaseMessage(KNOB_DIAL_ID, controlID);
-    message += formatInt(value);
+    formatInt(message, value);
     message += String(END_DELIM);
     return message;
 }
 
 String DashioDevice::getKnobDialMessage(const String& controlID, float value) {
     String message = getControlBaseMessage(KNOB_DIAL_ID, controlID);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -854,14 +1009,14 @@ String DashioDevice::getKnobDialMessage(const String& controlID) {
 
 String DashioDevice::getDialMessage(const String& controlID, int value) {
     String message = getControlBaseMessage(DIAL_ID, controlID);
-    message += formatInt(value);
+    formatInt(message, value);
     message += String(END_DELIM);
     return message;
 }
 
 String DashioDevice::getDialMessage(const String& controlID, float value) {
     String message = getControlBaseMessage(DIAL_ID, controlID);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -875,10 +1030,10 @@ String DashioDevice::getDialMessage(const String& controlID) {
 
 String DashioDevice::getDirectionMessage(const String& controlID, int direction, float speed) {
     String message = getControlBaseMessage(DIRECTION_ID, controlID);
-    message += formatInt(direction);
+    formatInt(message, direction);
     if (speed >= 0) {
         message += String(DELIM);
-        message += formatFloat(speed);
+        formatFloat(message, speed);
     }
     message += String(END_DELIM);
     return message;
@@ -886,10 +1041,10 @@ String DashioDevice::getDirectionMessage(const String& controlID, int direction,
 
 String DashioDevice::getDirectionMessage(const String& controlID, float direction, float speed) {
     String message = getControlBaseMessage(DIRECTION_ID, controlID);
-    message += formatFloat(direction);
+    formatFloat(message, direction);
     if (speed >= 0) {
         message += String(DELIM);
-        message += formatFloat(speed);
+        formatFloat(message, speed);
     }
     message += String(END_DELIM);
     return message;
@@ -1023,7 +1178,7 @@ void DashioDevice::addChartLineInts(String& message, const String& controlID, co
     addYaxisSelectStr(message, yAxisSelect);
     for (int i = 0; i < dataLength; i++) {
         message += String(DELIM);
-        message += formatInt(lineData[i]);
+        formatInt(message, lineData[i]);
     }
     message += String(END_DELIM);
 }
@@ -1041,7 +1196,7 @@ void DashioDevice::addChartLineFloats(String& message, const String& controlID, 
     addYaxisSelectStr(message, yAxisSelect);
     for (int i = 0; i < dataLength; i++) {
         message += String(DELIM);
-        message += formatFloat(lineData[i]);
+        formatFloat(message, lineData[i]);
     }
     message += String(END_DELIM);
 }
@@ -1074,7 +1229,7 @@ void DashioDevice::addTimeGraphLineFloats(String& message, const String& control
         message += String(DELIM);
         message += times[i];
         message += ",";
-        message += formatFloat(lineData[i]);
+        formatFloat(message, lineData[i]);
     }
     message += String(END_DELIM);
 }
@@ -1095,7 +1250,7 @@ void DashioDevice::addTimeGraphLineFloats(String& message, const String& control
         strftime(timeBuf, 21, "%Y-%m-%dT%H:%M:%SZ", localtime(&times[i]));
         message += String(timeBuf);
         message += ",";
-        message += formatFloat(lineData[i]);
+        formatFloat(message, lineData[i]);
     }
     message += String(END_DELIM);
 }
@@ -1113,7 +1268,7 @@ void DashioDevice::addTimeGraphLineFloatsArr(String& message, const String& cont
             if (j > 0) {
                 message += ",";
             }
-            message += formatFloat(lineData[i][j]);
+            formatFloat(message, lineData[i][j]);
         }
         message += "]";
     }
@@ -1139,7 +1294,7 @@ String DashioDevice::getTimeGraphPoint(const String& controlID, const String& li
     String message = getControlBaseMessage(TIME_GRAPH_ID, controlID);
     message += lineID;
     message += String(DELIM);
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -1150,7 +1305,7 @@ String DashioDevice::getTimeGraphPoint(const String& controlID, const String& li
     message += String(DELIM);
     message += time;
     message += ",";
-    message += formatFloat(value);
+    formatFloat(message, value);
     message += String(END_DELIM);
     return message;
 }
@@ -1164,7 +1319,7 @@ void DashioDevice::addTimeGraphPointArr(String& message, const String& controlID
         if (i > 0) {
             message += ",";
         }
-        message += formatFloat(value[i]);
+        formatFloat(message, value[i]);
     }
     message += "]";
     message += String(END_DELIM);
@@ -1181,7 +1336,7 @@ void DashioDevice::addTimeGraphPointArr(String& message, const String& controlID
         if (i != 0) {
             message += ",";
         }
-        message += formatFloat(value[i]);
+        formatFloat(message, value[i]);
     }
     message += "]";
     message += String(END_DELIM);
@@ -1215,7 +1370,8 @@ String DashioDevice::getControlTypeStr(ControlType controltype) {
         case mapper: return MAP_ID;
         case colorPicker: return COLOR_ID;
         case audioVisual: return AV_ID;
-              
+        case tableDisplay: return TABLE_ID;
+
         case deviceName: return DEVICE_NAME_ID;
         case wifiSetup: return WIFI_SETUP_ID;
         case tcpSetup: return TCP_SETUP_ID;
@@ -1286,6 +1442,8 @@ ControlType DashioDevice::getControlType(String controltypeStr) {
         return colorPicker;
     } else if (controltypeStr == AV_ID) {
         return audioVisual;
+    } else if (controltypeStr == TABLE_ID) {
+        return tableDisplay;
     } else if (controltypeStr == DEVICE_NAME_ID) {
         return deviceName;
     } else if (controltypeStr == WIFI_SETUP_ID) {
@@ -1378,7 +1536,7 @@ void DashioDevice::addIntArray(String& message, int idata[], int dataLength) {
         if (i > 0) {
             message += String(DELIM);
         }
-        message += formatInt(idata[i]);
+        formatInt(message, idata[i]);
     }
     message += String(END_DELIM);
 }
@@ -1388,7 +1546,7 @@ void DashioDevice::addFloatArray(String& message, float fdata[], int dataLength)
         if (i > 0) {
             message += String(DELIM);
         }
-        message += formatFloat(fdata[i]);
+        formatFloat(message, fdata[i]);
     }
     message += String(END_DELIM);
 }

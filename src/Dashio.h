@@ -129,6 +129,7 @@ enum ControlType {
     mapper,
     colorPicker,
     audioVisual,
+    tableDisplay,
 
     deviceName,
     wifiSetup,
@@ -289,6 +290,8 @@ public:
     String getButtonMessage(const String& controlID, bool on, const String& iconName = "", const String& text = "");
 
     String getTextBoxMessage(const String& controlID, const String& text, const String& color = "");
+    String getTextBoxMessage(const String& controlID, float value, const String& color = "");
+    String getTextBoxMessage(const String& controlID, int value, const String& color = "");
     String getTextBoxCaptionMessage(const String& controlID, const String& text, const String& color = "");
 
     String getSelectorMessage(const String& controlID);
@@ -347,7 +350,16 @@ public:
     void addTimeGraphPointArr(String& message, const String& controlID, const String& lineID, float value[], int arrSize);
     void addTimeGraphPointArr(String& message, const String& controlID, const String& lineID, String time, float value[], int arrSize);
 
-//  Config messages
+    void addTableClearMessage(String& message, const String& controlID);
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex);
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, String rowData[], int dataLength);
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, String rowData[], int dataLength, const String& label, const String& units = "");
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, int rowData[], int dataLength);
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, int rowData[], int dataLength, const String& label, const String& units = "");
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength);
+    void addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength, const String& label, const String& units = "");
+
+    //  Config messages
     String getC64ConfigBaseMessage();
     String getC64ConfigMessage(); //??? Obsolete - remove in due course
 
