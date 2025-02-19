@@ -178,6 +178,83 @@ void formatInt(String& message, int value) {
     }
 }
 
+ControlType dashioGetControlType(const String& controltypeStr) {
+    if (controltypeStr == CONNECT_ID) {
+        return connect;
+    } else if (controltypeStr == WHO_ID) {
+        return who;
+    } else if (controltypeStr == CTRL_ID) {
+        return ctrl;
+    } else if (controltypeStr == STATUS_ID) {
+        return status;
+    } else if (controltypeStr == CLOCK_ID) {
+        return dashClock;
+    } else if (controltypeStr == CONFIG_ID) {
+        return config;
+    } else if (controltypeStr == DEVICE_ID) {
+        return device;
+    } else if (controltypeStr == DEVICE_VIEW_ID) {
+        return deviceView;
+    } else if (controltypeStr == LABEL_ID) {
+        return label;
+    } else if (controltypeStr == BUTTON_ID) {
+        return button;
+    } else if (controltypeStr == MENU_ID) {
+        return menu;
+    } else if (controltypeStr == BUTTON_GROUP_ID) {
+        return buttonGroup;
+    } else if (controltypeStr == EVENT_LOG_ID) {
+        return eventLog;
+    } else if (controltypeStr == SLIDER_ID) {
+        return slider;
+    } else if (controltypeStr == KNOB_ID) {
+        return knob;
+    } else if (controltypeStr == DIAL_ID) {
+        return dial;
+    } else if (controltypeStr == DIRECTION_ID) {
+        return direction;
+    } else if (controltypeStr == TEXT_BOX_ID) {
+        return textBox;
+    } else if (controltypeStr == SELECTOR_ID) {
+        return selector;
+    } else if (controltypeStr == CHART_ID) {
+       return chart;
+    } else if (controltypeStr == TIME_GRAPH_ID) {
+        return timeGraph;
+    } else if (controltypeStr == MAP_ID) {
+        return mapper;
+    } else if (controltypeStr == COLOR_ID) {
+        return colorPicker;
+    } else if (controltypeStr == AV_ID) {
+        return audioVisual;
+    } else if (controltypeStr == TABLE_ID) {
+        return tableDisplay;
+    } else if (controltypeStr == DEVICE_NAME_ID) {
+        return deviceName;
+    } else if (controltypeStr == WIFI_SETUP_ID) {
+        return wifiSetup;
+    } else if (controltypeStr == TCP_SETUP_ID) {
+        return tcpSetup;
+    } else if (controltypeStr == DASHIO_SETUP_ID) {
+        return dashioSetup;
+    } else if (controltypeStr == MQTT_SETUP_ID) {
+        return mqttSetup;
+    } else if (controltypeStr == RESET_DEVICE_ID) {
+        return resetDevice;
+    } else if (controltypeStr == MQTT_CONNECTION_ID) {
+        return mqttConn;
+    } else if (controltypeStr == BLE_CONNECTION_ID) {
+        return bleConn;
+    } else if (controltypeStr == TCP_CONNECTION_ID) {
+        return tcpConn;
+    } else if (controltypeStr == ALARM_ID) {
+        return alarmNotify;
+    } else if (controltypeStr == INIT_MODULE_ID) {
+        return initModule;
+    }
+    return unknown;
+}
+
 MessageData::MessageData(ConnectionType connType, int _bufferLength) {
     bufferLength = _bufferLength;
     buffer = new char [bufferLength];
@@ -308,52 +385,8 @@ bool MessageData::processChar(char chr) {
                 payloadStr2 = "";
                 break;
             case 1:
-                if (readStr == WHO_ID) {
-                    control = who;
-                } else if (readStr == CTRL_ID) {
-                    control = ctrl;
-                } else if (readStr == CONNECT_ID) {
-                    control = connect;
-                } else if (readStr == CLOCK_ID) {
-                    control = dashClock;
-                } else if (readStr == STATUS_ID) {
-                    control = status;
-                } else if (readStr == CONFIG_ID) {
-                    control = config;
-                } else if (readStr == BUTTON_ID) {
-                    control = button;
-                } else if (readStr == SLIDER_ID) {
-                    control = slider;
-                } else if (readStr == KNOB_ID) {
-                    control = knob;
-                } else if (readStr == TEXT_BOX_ID) {
-                    control = textBox;
-                } else if (readStr == TIME_GRAPH_ID) {
-                    control = timeGraph;
-                } else if (readStr == MENU_ID) {
-                    control = menu;
-                } else if (readStr == BUTTON_GROUP_ID) {
-                    control = buttonGroup;
-                } else if (readStr == EVENT_LOG_ID) {
-                    control = eventLog;
-                } else if (readStr == SELECTOR_ID) {
-                    control = selector;
-                } else if (readStr == COLOR_ID) {
-                    control = colorPicker;
-                } else if (readStr == DEVICE_NAME_ID) {
-                    control = deviceName;
-                } else if (readStr == WIFI_SETUP_ID) {
-                    control = wifiSetup;
-                } else if (readStr == TCP_SETUP_ID) {
-                    control = tcpSetup;
-                } else if (readStr == DASHIO_SETUP_ID) {
-                    control = dashioSetup;
-                } else if (readStr == MQTT_SETUP_ID) {
-                    control = mqttSetup;
-                } else if (readStr == RESET_DEVICE_ID) {
-                    control = resetDevice;
-                } else {
-                    control = unknown;
+                control = dashioGetControlType(readStr);
+                if (control == unknown) {
                     segmentCount = -1;
                 }
                 break;
@@ -1393,81 +1426,8 @@ String DashioDevice::getControlTypeStr(ControlType controltype) {
     return "";
 }
 
-ControlType DashioDevice::getControlType(String controltypeStr) {
-    if (controltypeStr == CONNECT_ID) {
-        return connect;
-    } else if (controltypeStr == WHO_ID) {
-        return who;
-    } else if (controltypeStr == CTRL_ID) {
-        return ctrl;
-    } else if (controltypeStr == STATUS_ID) {
-        return status;
-    } else if (controltypeStr == CLOCK_ID) {
-        return dashClock;
-    } else if (controltypeStr == CONFIG_ID) {
-        return config;   
-    } else if (controltypeStr == DEVICE_ID) {
-        return device;
-    } else if (controltypeStr == DEVICE_VIEW_ID) {
-        return deviceView;
-    } else if (controltypeStr == LABEL_ID) {
-        return label;
-    } else if (controltypeStr == BUTTON_ID) {
-        return button;
-    } else if (controltypeStr == MENU_ID) {
-        return menu;
-    } else if (controltypeStr == BUTTON_GROUP_ID) {
-        return buttonGroup;
-    } else if (controltypeStr == EVENT_LOG_ID) {
-        return eventLog;
-    } else if (controltypeStr == SLIDER_ID) {
-        return slider;
-    } else if (controltypeStr == KNOB_ID) {
-        return knob;
-    } else if (controltypeStr == DIAL_ID) {
-        return dial;
-    } else if (controltypeStr == DIRECTION_ID) {
-        return direction;
-    } else if (controltypeStr == TEXT_BOX_ID) {
-        return textBox;
-    } else if (controltypeStr == SELECTOR_ID) {
-        return selector;
-     } else if (controltypeStr == CHART_ID) {
-       return chart;
-    } else if (controltypeStr == TIME_GRAPH_ID) {
-        return timeGraph;
-    } else if (controltypeStr == MAP_ID) {
-        return mapper;
-    } else if (controltypeStr == COLOR_ID) {
-        return colorPicker;
-    } else if (controltypeStr == AV_ID) {
-        return audioVisual;
-    } else if (controltypeStr == TABLE_ID) {
-        return tableDisplay;
-    } else if (controltypeStr == DEVICE_NAME_ID) {
-        return deviceName;
-    } else if (controltypeStr == WIFI_SETUP_ID) {
-        return wifiSetup;
-    } else if (controltypeStr == TCP_SETUP_ID) {
-        return tcpSetup;
-    } else if (controltypeStr == DASHIO_SETUP_ID) {
-        return dashioSetup;
-    } else if (controltypeStr == MQTT_SETUP_ID) {
-        return mqttSetup;
-    } else if (controltypeStr == RESET_DEVICE_ID) {
-        return resetDevice;
-    } else if (controltypeStr == MQTT_CONNECTION_ID) {
-        return mqttConn;
-    } else if (controltypeStr == BLE_CONNECTION_ID) {
-        return bleConn;
-    } else if (controltypeStr == TCP_CONNECTION_ID) {
-        return tcpConn;
-    } else if (controltypeStr == ALARM_ID) {
-        return alarmNotify;
-    } else if (controltypeStr == INIT_MODULE_ID) {
-        return initModule;
-    }
-    return unknown;
+ControlType DashioDevice::getControlType(const String& controltypeStr) {
+    return dashioGetControlType(controltypeStr);
 }
 
 String DashioDevice::getMQTTSubscribeTopic(const String& userName) {
