@@ -44,8 +44,9 @@ For previous releases, please refer to <a href="https://github.com/dashio-connec
 - Support for Table Control that will soon be released
 - Minor efficiency improvements
 
-### 1.2.3 (19 Feb 2025)
+### 1.2.3 (8 Mer 2025)
 
 - Code optimisation
+- Update const naming to avoid conflicts
 
 

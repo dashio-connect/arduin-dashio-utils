@@ -55,7 +55,7 @@ const char MAP[] = "MAP";
 const char LOG[] = "LOG";
 const char DASH_CLOCK[] = "CLK";
 const char ALARM[] = "ALM";
-const char LED[] = "LED";
+const char DASHLEDS[] = "LED";
 
 class DashSerial {
 private:
