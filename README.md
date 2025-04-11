@@ -30,13 +30,10 @@ The **Dash** app is free and available for both Apple and Android devices. Use i
 
 For previous releases, please refer to <a href="https://github.com/dashio-connect/arduino-dashio">github.com/dashio-connect/arduino-dashio</a>, which is now obsolete.
 
-### 1.2.0 (30 September 2024)
+### 1.2.3 (8 March 2025)
 
-- Release to Arduino library
-
-### 1.2.1 (1 October 2024)
-
-- Updated library properties
+- Code optimisation
+- Update const naming to avoid conflicts
 
 ### 1.2.2 (16 October 2024)
 
@@ -44,9 +41,14 @@ For previous releases, please refer to <a href="https://github.com/dashio-connec
 - Support for Table Control that will soon be released
 - Minor efficiency improvements
 
-### 1.2.3 (8 Mer 2025)
+### 1.2.1 (1 October 2024)
 
-- Code optimisation
-- Update const naming to avoid conflicts
+- Updated library properties
+
+### 1.2.0 (30 September 2024)
+
+- Release to Arduino library
+
+
 
 
