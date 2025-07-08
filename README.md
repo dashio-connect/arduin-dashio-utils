@@ -30,6 +30,10 @@ The **Dash** app is free and available for both Apple and Android devices. Use i
 
 For previous releases, please refer to <a href="https://github.com/dashio-connect/arduino-dashio">github.com/dashio-connect/arduino-dashio</a>, which is now obsolete.
 
+### 1.2.4 (9 July 2025)
+
+- Better handling of dashboardID in config messages
+
 ### 1.2.3 (8 March 2025)
 
 - Code optimisation

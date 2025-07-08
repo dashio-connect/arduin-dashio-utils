@@ -1117,7 +1117,7 @@ String DashioDevice::getMapWaypointMessage(const String& controlID, const String
 
 String DashioDevice::getMapTrackMessage(const String& controlID, const String& trackID, const String& text, const String& colour, Waypoint waypoints[], int numWaypoints) {
     String message = getControlBaseMessage(MAP_ID, controlID);
-    message += dashboardID;
+    message += BROADCAST_DASHBOARD_ID;
     message += String(DELIM);
     message += trackID;
     message += String(DELIM);
@@ -1166,7 +1166,7 @@ void DashioDevice::addEventLogMessage(String& message, const String& controlID, 
 
 void DashioDevice::addEventLogMessage(String& message, const String& controlID, Event events[], int numEvents) {
     addControlBaseMessage(message, EVENT_LOG_ID, controlID);
-    message += dashboardID;
+    message += BROADCAST_DASHBOARD_ID;
     message += String(DELIM);
 
     for (int i = 0; i < numEvents; i++) {
@@ -1178,21 +1178,25 @@ void DashioDevice::addEventLogMessage(String& message, const String& controlID, 
     message += String(END_DELIM);
 }
 
-String DashioDevice::getC64ConfigBaseMessage() {
+String DashioDevice::getC64ConfigBaseMessage(const String& _dashboardID) {
     String message = String(DELIM);
     message += deviceID;
     message += String(DELIM);
     message += CONFIG_ID;
     message += String(DELIM);
-    message += dashboardID;
+    if (_dashboardID.length() > 0) {
+        message += _dashboardID;
+    } else {
+        message += dashboardID;
+    }
     message += String(DELIM);
     message += CONFIG_C64;
     message += String(DELIM);
     return message;
 }
 
-String DashioDevice::getC64ConfigMessage() {
-    String message = getC64ConfigBaseMessage();
+String DashioDevice::getC64ConfigMessage(const String& _dashboardID) {
+    String message = getC64ConfigBaseMessage(_dashboardID);
     message += configC64Str;
     message += String(END_DELIM);
     return message;
@@ -1234,9 +1238,9 @@ void DashioDevice::addChartLineFloats(String& message, const String& controlID, 
     message += String(END_DELIM);
 }
 
-void DashioDevice::addTimeGraphLineBaseMessage(String& message, const String& _dashboardID, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect) {
+void DashioDevice::addTimeGraphLineBaseMessage(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect) {
     addControlBaseMessage(message, TIME_GRAPH_ID, controlID);
-    message += _dashboardID;
+    message += BROADCAST_DASHBOARD_ID;
     message += String(DELIM);
     message += lineID;
     message += String(DELIM);
@@ -1251,13 +1255,13 @@ void DashioDevice::addTimeGraphLineBaseMessage(String& message, const String& _d
 
 String DashioDevice::getTimeGraphLine(const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect) {
     String message = "";
-    addTimeGraphLineBaseMessage(message, "BRDCST", controlID, lineID, lineName, lineType, color, yAxisSelect);
+    addTimeGraphLineBaseMessage(message, controlID, lineID, lineName, lineType, color, yAxisSelect);
     message += String(END_DELIM);
     return message;
 }
 
 void DashioDevice::addTimeGraphLineFloats(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect, String times[], float lineData[], int dataLength) {
-    addTimeGraphLineBaseMessage(message, dashboardID, controlID, lineID, lineName, lineType, color, yAxisSelect);
+    addTimeGraphLineBaseMessage(message, controlID, lineID, lineName, lineType, color, yAxisSelect);
     for (int i = 0; i < dataLength; i++) {
         message += String(DELIM);
         message += times[i];
@@ -1268,7 +1272,7 @@ void DashioDevice::addTimeGraphLineFloats(String& message, const String& control
 }
 
 void DashioDevice::addTimeGraphLineFloats(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect, time_t times[], float lineData[], int dataLength, bool breakLine) {
-    addTimeGraphLineBaseMessage(message, dashboardID, controlID, lineID, lineName, lineType, color, yAxisSelect);
+    addTimeGraphLineBaseMessage(message, controlID, lineID, lineName, lineType, color, yAxisSelect);
     char timeBuf[21];
     if (breakLine && (dataLength > 0)) {
         message += String(DELIM);
@@ -1289,7 +1293,7 @@ void DashioDevice::addTimeGraphLineFloats(String& message, const String& control
 }
 
 void DashioDevice::addTimeGraphLineFloatsArr(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect, time_t times[], float **lineData, int dataLength, int arrSize) {
-    addTimeGraphLineBaseMessage(message, dashboardID, controlID, lineID, lineName, lineType, color, yAxisSelect);
+    addTimeGraphLineBaseMessage(message, controlID, lineID, lineName, lineType, color, yAxisSelect);
     char timeBuf[21];
     for (int i = 0; i < dataLength; i++) {
         message += String(DELIM);
@@ -1309,7 +1313,7 @@ void DashioDevice::addTimeGraphLineFloatsArr(String& message, const String& cont
 }
 
 void DashioDevice::addTimeGraphLineBools(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, String times[], bool lineData[], int dataLength) {
-    addTimeGraphLineBaseMessage(message, dashboardID, controlID, lineID, lineName, lineType, color, yLeft);
+    addTimeGraphLineBaseMessage(message, controlID, lineID, lineName, lineType, color, yLeft);
     for (int i = 0; i < dataLength; i++) {
         message += String(DELIM);
         message += times[i];

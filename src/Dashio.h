@@ -82,6 +82,7 @@ extern char DASH_SERVER[];
 #define INVALID_INT_VALUE INT_MAX
 
 #define DEFAULT_DEVICE_NAME "DashIO Device"
+#define BROADCAST_DASHBOARD_ID "BRDCST"
 
 const char END_DELIM = '\n';
 const char DELIM = '\t';
@@ -256,7 +257,7 @@ public:
     String deviceID = ((char *)0);
     String type = ((char *)0);
     String name = ((char *)0);
-    String dashboardID = "BRDCST";
+    String dashboardID = BROADCAST_DASHBOARD_ID; //??? Obsolete, remove in due course once all Arduino libraries are checked
     const char *configC64Str = nullptr;
     unsigned int cfgRevision = 0;
     
@@ -360,8 +361,8 @@ public:
     void addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength, const String& label, const String& units = "");
 
     //  Config messages
-    String getC64ConfigBaseMessage();
-    String getC64ConfigMessage(); //??? Obsolete - remove in due course
+    String getC64ConfigBaseMessage(const String& _dashboardID = "");
+    String getC64ConfigMessage(const String& _dashboardID = ""); //??? Obsolete - remove in due course
 
     String getOnlineMessage();
     String getOfflineMessage();
@@ -379,7 +380,7 @@ private:
     void addControlBaseMessage(String& message, const String& messageType, const String& controlID);
     void addLineTypeStr(String& message, LineType lineType);
     void addYaxisSelectStr(String& message, YAxisSelect yAxisSelect);
-    void addTimeGraphLineBaseMessage(String& message, const String& _dashboardID, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect);
+    void addTimeGraphLineBaseMessage(String& message, const String& controlID, const String& lineID, const String& lineName, LineType lineType, const String& color, YAxisSelect yAxisSelect);
     void addIntArray(String& message, int idata[], int dataLength);
     void addFloatArray(String& message, float fdata[], int dataLength);
 
