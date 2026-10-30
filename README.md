@@ -34,6 +34,7 @@ For previous releases, please refer to <a href="https://github.com/dashio-connec
 
 - Added *MessageData::setBufferSize()* to change the size of a connection's incoming message buffer after construction. Used by DashioESP for *DashioMQTT::incomingBufferSize*.
 - Added *DashioDevice::getConfigNAmessage()*
+- Fix compile error on AVR boards (*uint*)
 
 ### 1.2.4 (9 July 2025)
 
