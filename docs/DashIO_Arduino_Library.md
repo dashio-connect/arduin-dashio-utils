@@ -1,6 +1,6 @@
 # Dash Arduino C++ Library
 
-**30 October 2026**
+**31 October 2026**
 
 All Arduino C++ libraries include the core library files **DashIO.h** and **DashIO.cpp**. The Dash library is important for developing your projects for two main reasons:
 
@@ -90,7 +90,7 @@ wifi.begin(SSID, wifiPassword);
 - ***connection***. BLE, TCP or MQTT connection object as described below
 - ***SSID : String***. WiFi SSID
 - ***wifiPassword : String***. WiFi password
-- ***powerSave : bool***. *ESP32 only.* Default `false`. When `false`, WiFi power save is off: the radio stays awake, so incoming MQTT and TCP messages are not delayed when BLE is also in use. This uses more power, so set `wifi.powerSave = true;` for battery powered devices. Set before `wifi.begin()`; it is applied each time the WiFi connects.
+- ***powerSave : bool***. *ESP32 only.* Default `false`. When `false`, WiFi power save is off: the radio stays awake, so incoming MQTT and TCP messages are not delayed when BLE is also in use. This uses more power (but slows down TCP and MQTT comms) so set `wifi.powerSave = true;` for battery powered devices. Set before `wifi.begin()`; it is applied each time the WiFi connects.
 
 The final method must be called in the Arduino <code>loop()</code> method to allow the with WiFi and connections work.
 
@@ -194,7 +194,7 @@ DashioMQTT mqtt_con(&DashDevice, sendRebootAlarm, printMessages);
 **Options**
 
 ```
-DashMQTT::incomingBufferSize = 2048;  // ESP32 & ESP8266, set before the WiFi connects
+mqtt_con.incomingBufferSize = 2048;  // ESP32 & ESP8266, set before the WiFi connects
 mqtt_con.esp32_mqtt_blocking = true;  // ESP32 only, set before the WiFi connects
 ```
 
