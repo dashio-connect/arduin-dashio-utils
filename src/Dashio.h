@@ -239,6 +239,7 @@ public:
     String getConnectionTypeStr();
     
     void checkBuffer();
+    bool setBufferSize(int _bufferLength); // Reallocates the incoming buffer, discarding anything buffered. False if allocation fails
     
 private:
     char* buffer = nullptr;
@@ -361,6 +362,7 @@ public:
     void addTableRowMessage(String& message, const String& controlID, int rowIndex, float rowData[], int dataLength, const String& label, const String& units = "");
 
     //  Config messages
+    String getConfigNAmessage(const String& _dashboardID = "");
     String getC64ConfigBaseMessage(const String& _dashboardID = "");
     String getC64ConfigMessage(const String& _dashboardID = ""); //??? Obsolete - remove in due course
 

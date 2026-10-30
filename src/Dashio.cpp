@@ -27,6 +27,7 @@
 */
 
 #include "Dashio.h"
+#include <new>
 #include "DashioJSON.h"
 
 // Control type IDs
@@ -265,6 +266,22 @@ MessageData::MessageData(ConnectionType connType, int _bufferLength) {
     
     connectionType = connType;
 };
+
+bool MessageData::setBufferSize(int _bufferLength) {
+    if (_bufferLength == bufferLength) {
+        return true;
+    }
+    char* newBuffer = new (std::nothrow) char [_bufferLength];
+    if (newBuffer == nullptr) {
+        return false; // Keep the existing buffer
+    }
+    delete [] buffer;
+    buffer = newBuffer;
+    bufferLength = _bufferLength;
+    bufferWritePtr = 0;
+    bufferReadPtr = 0;
+    return true;
+}
 
 void MessageData::loadBuffer(const String& message, uint16_t _connectionHandle) {
     // Connection Handle is stored as the first bytes (of PREFIX_LEN) in the buffer message
@@ -1176,6 +1193,23 @@ void DashioDevice::addEventLogMessage(String& message, const String& controlID, 
         }
     }
     message += String(END_DELIM);
+}
+
+String DashioDevice::getConfigNAmessage(const String& _dashboardID) {
+    String message = String(DELIM);
+    message += deviceID;
+    message += String(DELIM);
+    message += CONFIG_ID;
+    message += String(DELIM);
+    if (_dashboardID.length() > 0) {
+        message += _dashboardID;
+    } else {
+        message += dashboardID;
+    }
+    message += String(DELIM);
+    message += "NA";
+    message += String(END_DELIM);
+    return message;
 }
 
 String DashioDevice::getC64ConfigBaseMessage(const String& _dashboardID) {
