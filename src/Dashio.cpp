@@ -285,7 +285,7 @@ bool MessageData::setBufferSize(int _bufferLength) {
 
 void MessageData::loadBuffer(const String& message, uint16_t _connectionHandle) {
     // Connection Handle is stored as the first bytes (of PREFIX_LEN) in the buffer message
-    uint prefixLen = sizeof(uint16_t);
+    unsigned int prefixLen = sizeof(uint16_t);
     char connectionHandleChrs[prefixLen];
     memcpy(connectionHandleChrs, &_connectionHandle, prefixLen);
 
@@ -325,7 +325,7 @@ void MessageData::loadBuffer(const String& message, uint16_t _connectionHandle) 
 void MessageData::checkBuffer() {
     if (!messageReceived) { // wait until last message processed
         if (bufferWritePtr != bufferReadPtr) {
-            uint prefixLen = sizeof(uint16_t);
+            unsigned int prefixLen = sizeof(uint16_t);
             char prefixChrs[prefixLen];
             bool unloadedMessage = false;
             int count = 0;
