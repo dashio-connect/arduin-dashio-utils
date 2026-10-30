@@ -1,6 +1,6 @@
 # Dash Arduino C++ Library
 
-**31 October 2024**
+**30 October 2026**
 
 All Arduino C++ libraries include the core library files **DashIO.h** and **DashIO.cpp**. The Dash library is important for developing your projects for two main reasons:
 
@@ -90,6 +90,7 @@ wifi.begin(SSID, wifiPassword);
 - ***connection***. BLE, TCP or MQTT connection object as described below
 - ***SSID : String***. WiFi SSID
 - ***wifiPassword : String***. WiFi password
+- ***powerSave : bool***. *ESP32 only.* Default `false`. When `false`, WiFi power save is off: the radio stays awake, so incoming MQTT and TCP messages are not delayed when BLE is also in use. This uses more power, so set `wifi.powerSave = true;` for battery powered devices. Set before `wifi.begin()`; it is applied each time the WiFi connects.
 
 The final method must be called in the Arduino <code>loop()</code> method to allow the with WiFi and connections work.
 
@@ -189,6 +190,16 @@ DashioMQTT mqtt_con(&DashDevice, sendRebootAlarm, printMessages);
 - ***sendRebootAlarm : bool***. Enable an alarm message when the IoT device reboots
 - ***printMessages : bool***. Print debug messages to the Serial port
 - ***mqttBufferSize : int***. Maximum message size. Setting to 1024 or greater will allow sending of successive MQTT by the IoT device to be grouped together for faster communication.
+
+**Options**
+
+```
+DashMQTT::incomingBufferSize = 2048;  // ESP32 & ESP8266, set before the WiFi connects
+mqtt_con.esp32_mqtt_blocking = true;  // ESP32 only, set before the WiFi connects
+```
+
+- ***incomingBufferSize : int***. *ESP32 & ESP8266.* Size in bytes of the buffer holding incoming MQTT messages until they are processed. Default and minimum 512; a smaller value is raised to 512. It is shared by all MQTT connections. This is not **mqttBufferSize**, which sets the size of outgoing groups of messages. A single incoming message can still be no larger than the MQTT client's own 2048 byte buffer.
+- ***esp32_mqtt_blocking : bool***. *ESP32 only.* Default `false`: MQTT runs in its own task, so slow publishes and reconnects do not block `loop()`. Set `true` to run MQTT inside `loop()`, as in earlier versions.
 
 **Methods**
 
@@ -393,6 +404,10 @@ The important attributes of the **MessageData** are:
 - ***idStr : String*** - Contains the control_ID of the received message.
 - ***payloadStr : String*** - Contains the primary payload field of the received message.
 - ***payloadStr2 : String*** - Contains the secondary payload field of the received message.
+
+**Methods**
+
+- ***setBufferSize(int length) : bool*** - Changes the size of the buffer holding incoming message text. Anything already buffered is discarded. Returns `false`, keeping the existing buffer, if the memory cannot be allocated. This is used by the hardware libraries (for example **DashioESP** for *incomingBufferSize*); you would not normally call it.
 
 Examples for each control are given in the [Controls](#controls-id) section.
 
