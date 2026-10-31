@@ -80,13 +80,13 @@ DashioWiFi wifi;
 **Methods**
 
 ```
-wifi.setOnConnectCallback(&onWiFiConnectCallback); DEPRECATED
+wifi.setOnConnectCallback(&onWiFiConnectCallback); // ESP32 & ESP8266 only, DEPRECATED
 wifi.attachConnection(&connection);
 wifi.begin(SSID, wifiPassword);
 ```
 **Attributes**
 
-- ***onWiFiConnectCallback(void)***. Callback which is called when the WiFi is successfully connected (see examples below) DEPRECATED, use dashDevice.setStatusCallback.
+- ***onWiFiConnectCallback(void)***. *ESP32 & ESP8266 only.* Callback which is called when the WiFi is successfully connected. DEPRECATED, use dashDevice.setStatusCallback (see [Connection Status Callback](#connection-status-callback)).
 - ***connection***. BLE, TCP or MQTT connection object as described below
 - ***SSID : String***. WiFi SSID
 - ***wifiPassword : String***. WiFi password
@@ -109,7 +109,6 @@ DashioLTE lte;
 **Methods**
 
 ```
-lte.setOnConnectCallback(&onLTEconnectCallback);
 lte.attachConnection(&connection);
 lte.begin(pin);
 lte.begin(pin, apn);
@@ -117,7 +116,6 @@ lte.begin(pin, apn, username, password);
 ```
 **Attributes**
 
-- ***onLTEconnectCallback(void)***. Callback which is called when LTE is successfully connected
 - ***connection***. BLE, TCP or MQTT connection object as described below
 - ***pin : String***. SIM PIN number (4 digits in a string, example: "1234"). optional
 - ***apn : String***. APN to use. optional
@@ -329,21 +327,34 @@ void setup() {
 
 A Soft AP connection is also available for ESP devices. Please review the header file "DashioESP.h" for details.
 
-### WiFi Connection Callback
+### Connection Status Callback <a name="connection-status-callback"></a>
 
-You can also setup a callback that is executed when the WiFI is connected:
+*ESP32 & ESP8266 only.* The IoT device can be told when the WiFi and MQTT connections come up or go down by setting a status callback on the DashDevice:
 
 ```
-void onWiFiConnectCallback(void) {
-    // Do something useful when the WiFi connects
+void onStatusCallback(StatusCode statusCode) {
+    switch (statusCode) {
+    case wifiConnected:
+        // Do something useful when the WiFi connects
+        break;
+    case mqttConnected:
+        // Do something useful when the MQTT connection is made
+        break;
+    default:
+        break;
+    }
 }
 
 void setup() {
-    wifi.setOnConnectCallback(&onWiFiConnectCallback);
-    
+    dashDevice.setStatusCallback(&onStatusCallback);
+
     // etc.
 }
 ```
+
+The **StatusCode** values are **wifiConnected**, **wifiDisconnected**, **mqttConnected** and **mqttDisconnected**. The callback is called from <code>wifi.run()</code> in the Arduino <code>loop()</code>, so it is safe to send messages from it.
+
+The libraries for the other boards (SAMD and MKR NB 1500) do not report connection status yet, so the status callback is not called on those boards.
 
 ### Running the Connections
 
@@ -473,6 +484,31 @@ void processIncomingMessage(MessageData * messageData) {
     }
 }
 ```
+
+#### Receiving the Time (Clock Messages)
+
+An IoT device connected through MQTT can get the time from the **dash** server. This is useful for time-stamping Event Log entries and Time Graph data when the device has no real time clock. After the MQTT connection is made, request the time by sending a clock request message, created with <code>dashDevice.getClockMessage()</code>, to the *announce* topic:
+
+```
+void statusCallback(StatusCode statusCode) {
+    if (statusCode == mqttConnected) {
+        mqtt_con.sendMessage(dashDevice.getClockMessage(), announce_topic);
+    }
+}
+```
+
+The status callback is only called on ESP32 and ESP8266 (see [Connection Status Callback](#connection-status-callback)). On other boards, send the clock request from your own code once the MQTT connection has been made.
+
+The server replies with a clock message, which arrives in the incoming message callback with the **control** set to **dashClock**. The reply looks like:
+
+```
+\t<deviceID>\tCLK\tsrv_clk\t<epoch>\n
+```
+
+- ***idStr : String*** - Contains *srv_clk*.
+- ***payloadStr : String*** - Contains the time as Unix time: whole seconds since 1 January 1970, UTC.
+
+How the clock is set depends on the hardware, so please refer to the software guide for your hardware for the code. Whatever the hardware, the clock must be set to exactly the received time. On the ESP32, for example, <code>settimeofday()</code> takes a <code>struct timeval</code> whose microseconds field (<code>tv_usec</code>) is added to the clock without any checking. If the structure is not initialised, random microseconds will shift the clock by up to many minutes.
 
 ### Sending Messages
 
