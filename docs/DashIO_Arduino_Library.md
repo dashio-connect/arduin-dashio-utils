@@ -80,13 +80,11 @@ DashioWiFi wifi;
 **Methods**
 
 ```
-wifi.setOnConnectCallback(&onWiFiConnectCallback); // ESP32 & ESP8266 only, DEPRECATED
 wifi.attachConnection(&connection);
 wifi.begin(SSID, wifiPassword);
 ```
 **Attributes**
 
-- ***onWiFiConnectCallback(void)***. *ESP32 & ESP8266 only.* Callback which is called when the WiFi is successfully connected. DEPRECATED, use dashDevice.setStatusCallback (see [Connection Status Callback](#connection-status-callback)).
 - ***connection***. BLE, TCP or MQTT connection object as described below
 - ***SSID : String***. WiFi SSID
 - ***wifiPassword : String***. WiFi password
