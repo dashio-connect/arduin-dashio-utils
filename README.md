@@ -30,6 +30,11 @@ The **Dash** app is free and available for both Apple and Android devices. Use i
 
 For previous releases, please refer to <a href="https://github.com/dashio-connect/arduino-dashio">github.com/dashio-connect/arduino-dashio</a>, which is now obsolete.
 
+### 1.2.6 (not released yet)
+
+- Incoming *SAF* messages are now recognised, as control type *storeAndForward*, instead of being dropped as unknown. This is for the *SAF END* message from the **dash** server (`\t<deviceID>\tSAF\tEND\n`). The server sends it after a device's *WHO*, following the Store and Forward messages held for the device in the same payload, or on its own when none are held, so a device that sleeps knows when it can go back to sleep. Check for it in the incoming message callback with `messageData->control == storeAndForward && messageData->idStr == SAF_END_ID`.
+- Fix incoming messages being misread when several arrive together in one MQTT or BLE payload (e.g. the held Store and Forward messages the **dash** server sends when a device connects). Every message after the first lost its first two characters, so it kept fields from the message before it (a *SAF END* arrived carrying the previous text box value) and got the wrong BLE connection handle.
+
 ### 1.2.5 (30 October 2026)
 
 - Added *MessageData::setBufferSize()* to change the size of a connection's incoming message buffer after construction. Used by DashioESP for *DashioMQTT::incomingBufferSize*.

@@ -83,6 +83,8 @@ extern char DASH_SERVER[];
 
 #define DEFAULT_DEVICE_NAME "DashIO Device"
 #define BROADCAST_DASHBOARD_ID "BRDCST"
+// idStr of the storeAndForward message the dash server sends after a device's held (Store and Forward) messages
+#define SAF_END_ID "END"
 
 const char END_DELIM = '\n';
 const char DELIM = '\t';
@@ -250,6 +252,7 @@ private:
     String readStr;
     
     void loadBuffer(const String& message, uint16_t _connectionHandle);
+    void writeBufferChar(char chr);
 };
 
 class DashioDevice {

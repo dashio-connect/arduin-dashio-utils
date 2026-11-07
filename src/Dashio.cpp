@@ -190,6 +190,8 @@ ControlType dashioGetControlType(const String& controltypeStr) {
         return status;
     } else if (controltypeStr == CLOCK_ID) {
         return dashClock;
+    } else if (controltypeStr == STORE_AND_FORWARD_ID) { // e.g. SAF END from the dash server after the held ctrls
+        return storeAndForward;
     } else if (controltypeStr == CONFIG_ID) {
         return config;
     } else if (controltypeStr == DEVICE_ID) {
@@ -284,12 +286,25 @@ bool MessageData::setBufferSize(int _bufferLength) {
 }
 
 void MessageData::loadBuffer(const String& message, uint16_t _connectionHandle) {
-    // Connection Handle is stored as the first bytes (of PREFIX_LEN) in the buffer message
+    // The connection handle is stored in front of each message (line) in the buffer, because checkBuffer() reads one
+    // message per call and takes the first bytes of each call as the handle. A part message at the end (one that
+    // continues in the next load, e.g. a long BLE message split over several writes) gets one too.
     unsigned int prefixLen = sizeof(uint16_t);
     char connectionHandleChrs[prefixLen];
     memcpy(connectionHandleChrs, &_connectionHandle, prefixLen);
 
-    int messageLength = message.length() + prefixLen;
+    unsigned int length = message.length();
+    unsigned int numMessages = 0;
+    for (unsigned int i = 0; i < length; i++) {
+        if (message[i] == END_DELIM) {
+            numMessages++;
+        }
+    }
+    if ((length > 0) && (message[length - 1] != END_DELIM)) {
+        numMessages++;
+    }
+
+    int messageLength = length + prefixLen * numMessages;
     int avail = 0;
     if (bufferLength > 0) {
         if (bufferWritePtr >= bufferReadPtr) {
@@ -308,17 +323,27 @@ void MessageData::loadBuffer(const String& message, uint16_t _connectionHandle) 
         Serial.println(message);
 #endif
     } else {
-        for (int i = 0; i < messageLength; i++) {
-            if (i < prefixLen) {
-                buffer[bufferWritePtr] = connectionHandleChrs[i];
-            } else {
-                buffer[bufferWritePtr] = message[i - prefixLen];
+        bool messageStart = true;
+        for (unsigned int i = 0; i < length; i++) {
+            if (messageStart) {
+                messageStart = false;
+                for (unsigned int j = 0; j < prefixLen; j++) {
+                    writeBufferChar(connectionHandleChrs[j]);
+                }
             }
-            bufferWritePtr++;
-            if (bufferWritePtr >= bufferLength) {
-                bufferWritePtr = 0;
+            writeBufferChar(message[i]);
+            if (message[i] == END_DELIM) {
+                messageStart = true;
             }
         }
+    }
+}
+
+void MessageData::writeBufferChar(char chr) {
+    buffer[bufferWritePtr] = chr;
+    bufferWritePtr++;
+    if (bufferWritePtr >= bufferLength) {
+        bufferWritePtr = 0;
     }
 }
 
